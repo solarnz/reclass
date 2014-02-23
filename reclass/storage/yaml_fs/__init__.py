@@ -8,6 +8,7 @@
 #
 import os, sys
 import fnmatch
+from reclass import datatypes
 from reclass.storage import NodeStorageBase
 from yamlfile import YamlFile
 from directory import Directory
@@ -63,7 +64,10 @@ class ExternalNodeStorage(NodeStorageBase):
             path = os.path.join(self.nodes_uri, relpath)
             name = os.path.splitext(relpath)[0]
         except KeyError, e:
-            raise reclass.errors.NodeNotFound(self.name, name, self.nodes_uri)
+            # There is no node configuration file found, so return an empty
+            # entity. This allows class mappings to work on nodes without a
+            # specific configuration file.
+            return datatypes.Entity(name=name, environment=self._default_environment)
         entity = YamlFile(path).get_entity(name, self._default_environment)
         return entity
 
